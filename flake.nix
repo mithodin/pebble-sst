@@ -39,6 +39,7 @@
         apps.test = {
           type = "app";
           program = "${pkgs.writeShellScript "pepple-sst-test-runner" ''
+            export PATH=${pkgs.gcc}/bin:${pkgs.gnumake}/bin:$PATH
             export UNITY_PATH=${unity.outPath}
             make -C tests test
           ''}";
