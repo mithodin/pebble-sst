@@ -42,13 +42,18 @@ Pinned via a flake input so we can read the wire format directly from the
 upstream branch rather than copy-paste constants:
 
 ```nix
-inputs.simpletimetracker.url =
-  "github:mithodin/Android-SimpleTimeTracker/feature/pebble-integration?shallow=1";
+inputs.simpletimetracker = {
+  url = "github:mithodin/Android-SimpleTimeTracker/feature/pebble-integration";
+  flake = false;
+};
 ```
 
-`shallow=1` keeps the fetch cheap — we need the tree, not history. The
-input is a build/dev-time reference only; it is **not** linked into the
-watch binary. It exists so that:
+`flake = false` because the upstream repo has no `flake.nix` — Nix fetches
+it as a plain source tree (available via `outPath`), per the [Nix flake
+input docs](https://nixos.org/manual/nix/stable/command-ref/new-cli/nix3-flake.html#flake-inputs).
+GitHub inputs are fetched as tarballs (not full clones), so it's already
+cheap. The input is a build/dev-time reference only; it is **not** linked
+into the watch binary. It exists so that:
 
 1. Future work can generate `protocol/keys.h` from the Kotlin source.
 2. Reviewers can `nix flake lock` and `nix run .#inspect-api` (or just
@@ -134,7 +139,10 @@ hand-rolled fakes are clearer than auto-generated mocks.
 Unity is vendored via a flake input (not committed to the repo):
 
 ```nix
-inputs.unity.url = "github:ThrowTheSwitch/Unity?shallow=1";
+inputs.unity = {
+  url = "github:ThrowTheSwitch/Unity";
+  flake = false;
+};
 ```
 
 The test runner is a plain `Makefile` under `tests/`:
@@ -177,11 +185,13 @@ pinned Unity source is controlled by Nix, not hard-coded.
 
 `gcc` + `gnumake` are added to the dev shell so `make -C tests test` works
 inside `nix develop`; the `apps.test` entry lets CI run `nix run .#test`.
+Both `simpletimetracker` and `unity` are non-flake inputs, accessed via
+`outPath` in the outputs function.
 
 ## Deliverable (this PR)
 
-1. **`flake.nix`** — add `simpletimetracker` + `unity` inputs; add `gcc`/`gnumake`
-   to the dev shell; add `apps.test`.
+1. **`flake.nix`** — add `simpletimetracker` + `unity` non-flake inputs (`flake = false`);
+   add `gcc`/`gnumake` to the dev shell; add `apps.test`.
 2. **`appinfo.json`** — Pebble manifest. UUID generated, `sdkVersion: "4.3"`,
    `targetPlatforms: ["aplite", "basalt", "chalk", "diorite", "emery"]`,
    `watchapp: { watchface: false }`. Note: `messageKeys` in `appinfo.json`
