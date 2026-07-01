@@ -1,0 +1,28 @@
+{
+  "name": "pepple-sst",
+  "author": "lucas",
+  "version": "1.0.0",
+  "keywords": ["pebble-app"],
+  "private": true,
+  "dependencies": {},
+  "pebble": {
+    "displayName": "SimpleTimeTracker",
+    "uuid": "04693941-efa3-404c-b1ec-6107c9e30085",
+    "sdkVersion": "4.3",
+    "enableMultiJS": true,
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite",
+      "emery"
+    ],
+    "watchapp": {
+      "watchface": false
+    },
+    "messageKeys": [],
+    "resources": {
+      "media": []
+    }
+  }
+}
