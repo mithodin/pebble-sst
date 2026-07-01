@@ -94,15 +94,16 @@ Method ids in scope for the eventual app:
 ```
 pepple-sst/
 ├── flake.nix                 # pebbleEnv + Unity + simpletimetracker input
-├── appinfo.json               # Pebble manifest (UUID, SDK 4.3, capabilities)
-├── package.json              # pebble build metadata
+├── package.json              # Pebble manifest (modern SDK 4 format)
+├── wscript                   # waf build script (globs src/c/**/*.c)
 ├── src/
-│   ├── main.c               # pebble_main: init/deinit, push dummy window
-│   ├── ui/
-│   │   ├── dummy.c          # static Window + TextLayer
-│   │   └── dummy.h
-│   └── protocol/
-│       └── keys.h           # mirrors PebbleRequests.kt (full set, future-proof)
+│   └── c/
+│       ├── main.c           # pebble_main: init/deinit, push dummy window
+│       ├── ui/
+│       │   ├── dummy.c      # static Window + TextLayer
+│       │   └── dummy.h
+│       └── protocol/
+│           └── keys.h       # mirrors PebbleRequests.kt (full set, future-proof)
 ├── tests/
 │   ├── Makefile             # host gcc: links Unity + fakes + src (minus main.c)
 │   ├── test_dummy.c         # asserts dummy_push creates window + text
@@ -150,11 +151,11 @@ The test runner is a plain `Makefile` under `tests/`:
 ```make
 # tests/Makefile
 CC      = gcc
-CFLAGS  = -I../src -I../src/ui -I../src/protocol -I. -Ifakes \
+CFLAGS  = -I../src/c -I../src/c/ui -I../src/c/protocol -I. -Ifakes \
           -DUNITY_INCLUDE_DOUBLE -Wall -Wextra -std=c11
-SRC     = ../src/ui/dummy.c
+SRC     = ../src/c/ui/dummy.c
 FAKES   = fakes/pebble_sdk_fake.c
-UNITY   = $(UNITY_PATH)/unity/unity.c $(UNITY_PATH)/unity/unity_memory.c
+UNITY   = $(UNITY_PATH)/src/unity.c $(UNITY_PATH)/src/unity_memory.c
 TESTS   = test_dummy.c test_main.c
 
 test:
@@ -192,20 +193,22 @@ Both `simpletimetracker` and `unity` are non-flake inputs, accessed via
 
 1. **`flake.nix`** — add `simpletimetracker` + `unity` non-flake inputs (`flake = false`);
    add `gcc`/`gnumake` to the dev shell; add `apps.test`.
-2. **`appinfo.json`** — Pebble manifest. UUID generated, `sdkVersion: "4.3"`,
-   `targetPlatforms: ["aplite", "basalt", "chalk", "diorite", "emery"]`,
-   `watchapp: { watchface: false }`. Note: `messageKeys` in `appinfo.json`
-   is omitted in this PR — it's only needed once AppMessage is wired (the
-   keys would duplicate `protocol/keys.h`, so it's added when RPC lands to
-   avoid two sources of truth for unused constants).
-3. **`package.json`** — minimal `pebble` build metadata (`name`, `author`,
-   `version`, `pebble.sdkVersion`).
-4. **`src/main.c`** — `pebble_main()` calling `dummy_push()` then
+2. **`package.json`** — modern Pebble manifest (SDK 4 format: top-level
+   `name`/`version`/`author` + a `pebble` object). The `pebble` object
+   contains: generated `uuid`, `sdkVersion: "4.3"`, `targetPlatforms`
+   (all platforms), `watchapp: { watchface: false }`, `messageKeys: []`.
+   (The legacy `appinfo.json` format is for SDK 2/3; modern C projects use
+   `package.json` — verified in `pebble_tool/sdk/project.py`:
+   `NpmProject` parses `package.json`'s `pebble` key for all project types,
+   and `pebble new-project` scaffolds `package.json` for C projects.)
+3. **`wscript`** — waf build script (from the official `app/wscript`
+   template): globs `src/c/**/*.c` per platform, bundles into `.pbw`.
+4. **`src/c/main.c`** — `main()` calling `dummy_push()` then
    `app_event_loop()`.
-5. **`src/ui/dummy.c` / `dummy.h`** — `dummy_push()` creates a `Window`,
+5. **`src/c/ui/dummy.c` / `dummy.h`** — `dummy_push()` creates a `Window`,
    adds a `TextLayer` with "SimpleTimeTracker" title + "TODO" body, pushes
    onto the window stack.
-6. **`src/protocol/keys.h`** — all 13 method ids + pagination keys + inbox
+6. **`src/c/protocol/keys.h`** — all 13 method ids + pagination keys + inbox
    budget, with a header comment pointing at `PebbleRequests.kt` and noting
    the sync procedure.
 7. **`tests/`** — `test_main.c`, `test_dummy.c`, `fakes/pebble_sdk_fake.{c,h}`,
