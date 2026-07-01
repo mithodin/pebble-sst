@@ -146,7 +146,26 @@
       "inputs": {
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs",
-        "pebble": "pebble"
+        "pebble": "pebble",
+        "simpletimetracker": "simpletimetracker",
+        "unity": "unity"
+      }
+    },
+    "simpletimetracker": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1782919886,
+        "narHash": "sha256-CnoM/rNVRdFPWcyLvyWAvQLfRvhacoyjADoTN5qUrEU=",
+        "owner": "mithodin",
+        "repo": "Android-SimpleTimeTracker",
+        "rev": "1c1e82dc94b232ba06d558e9adf158de7f5c8627",
+        "type": "github"
+      },
+      "original": {
+        "owner": "mithodin",
+        "ref": "feature/pebble-integration",
+        "repo": "Android-SimpleTimeTracker",
+        "type": "github"
       }
     },
     "systems": {
@@ -161,6 +180,22 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default",
+        "type": "github"
+      }
+    },
+    "unity": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1780069786,
+        "narHash": "sha256-esQVS+3pFeeKfIce2UkYcb3Aluw/9qo3CPxxwBfxQwk=",
+        "owner": "ThrowTheSwitch",
+        "repo": "Unity",
+        "rev": "bbf8f3728a937c7627b8094de7ae13559d220ed5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ThrowTheSwitch",
+        "repo": "Unity",
         "type": "github"
       }
     }
