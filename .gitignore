@@ -5,3 +5,4 @@ dist.zip
 .lock-waf*
 node_modules/
 tests/test_runner
+.pebble-sdk/
