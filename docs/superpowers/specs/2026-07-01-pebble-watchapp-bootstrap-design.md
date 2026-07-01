@@ -155,7 +155,7 @@ CFLAGS  = -I../src/c -I../src/c/ui -I../src/c/protocol -I. -Ifakes \
           -DUNITY_INCLUDE_DOUBLE -Wall -Wextra -std=c11
 SRC     = ../src/c/ui/dummy.c
 FAKES   = fakes/pebble_sdk_fake.c
-UNITY   = $(UNITY_PATH)/src/unity.c $(UNITY_PATH)/src/unity_memory.c
+UNITY   = $(UNITY_PATH)/src/unity.c
 TESTS   = test_dummy.c test_main.c
 
 test:
