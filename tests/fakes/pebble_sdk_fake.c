@@ -66,6 +66,7 @@ TextLayer *text_layer_create(GRect bounds) {
 }
 
 void text_layer_destroy(TextLayer *layer) {
+  if (layer == s_first_text_layer) s_first_text_layer = NULL;
   free(layer);
 }
 

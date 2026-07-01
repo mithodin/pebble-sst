@@ -7,7 +7,12 @@
  *
  * Sync procedure: diff this file against
  *   features/feature_pebble/src/main/java/com/example/util/simpletimetracker/feature_pebble/PebbleRequests.kt
- * in the simpletimetracker flake input (nix eval .#inputs.simpletimetracker.outPath).
+ * in the simpletimetracker flake input. The source path is not exposed as a
+ * flake output attribute (non-flake input), so obtain it with:
+ *   nix eval --impure --expr \
+ *     'let f = builtins.fetchTree { type = "github"; owner = "mithodin"; \
+ *       repo = "Android-SimpleTimeTracker"; ref = "feature/pebble-integration"; \
+ *     }; in f.outPath'
  * Method ids and pagination keys must match exactly.
  */
 
